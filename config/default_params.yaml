@@ -1,0 +1,43 @@
+fresnel:
+  wavelength: 632e-9
+  focal_length: 0.1
+  diameter: 0.025
+  n_refraction: 1.5
+  phase_levels: 8
+
+grating:
+  period: 2e-6
+  wavelength: 632e-9
+  incidence_angle: 0.0
+  max_order: 5
+  grating_type: sine_phase
+  phase_depth: 2.0
+  duty_cycle: 0.5
+
+fp_cavity:
+  reflectivity: 0.95
+  cavity_length: 100e-6
+  n_refraction: 1.0
+  incidence_angle: 0.0
+  wavelength_range:
+    min: 600e-9
+    max: 660e-9
+
+zernike:
+  noll_max: 36
+  grid_resolution: 256
+
+stereo:
+  baseline: 0.065
+  focal_length: 0.008
+  pixel_size: 3.45e-6
+  image_width: 1920
+  image_height: 1080
+  distance_range:
+    min: 0.5
+    max: 10.0
+
+plotting:
+  style: config/optics_style.mplstyle
+  output_dir: figures
+  format: png

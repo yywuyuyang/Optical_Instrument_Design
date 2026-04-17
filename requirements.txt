@@ -1,0 +1,9 @@
+numpy>=1.21
+scipy>=1.7
+matplotlib>=3.5
+plotly>=5.0
+hcipy>=0.7.0
+LightPipes>=2.0
+PyYAML>=6.0
+tqdm>=4.60
+pytest>=7.0
