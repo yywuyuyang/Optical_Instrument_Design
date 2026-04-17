@@ -38,6 +38,7 @@
 - 前36项 Zernike 多项式的空间分布
 - 2D 热力图与 3D 曲面图可视化
 - 涵盖离焦、像散、彗差、球差等经典像差类型
+- **GUI交互工具**：支持单项显示、多像差叠加、自定义保存路径
 
 ### 5. 双目测距模块设计 (`src/imaging/`)
 
@@ -55,12 +56,15 @@ Optical_Instrument_Design/
 ├── config/                     # 配置文件
 │   ├── default_params.yaml     # 默认参数配置
 │   └── optics_style.mplstyle   # Matplotlib 样式（中文字体）
+├── dist/                       # 打包后的可执行文件
+│   └── ZernikeViewer.exe       # Zernike GUI 独立程序
 ├── examples/                   # 示例脚本
 │   ├── example1_fresnel.py     # 菲涅尔透镜示例
 │   ├── example2_grating.py     # 光栅衍射示例
 │   ├── example3_fp_cavity.py   # F-P腔示例
-│   ├── example4_zernike.py     # Zernike像差示例
-│   └── example5_stereo.py      # 双目测距示例
+│   ├── example4_zernike_interactive.py  # Zernike CLI交互工具
+│   ├── example5_stereo.py      # 双目测距示例
+│   └── zernike_gui.py          # Zernike GUI交互工具
 ├── figures/                    # 输出图像
 │   ├── fresnel/
 │   ├── grating/
@@ -94,17 +98,17 @@ pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 ### 依赖项
 
-| 包 | 最低版本 | 用途 |
-|---|---|---|
-| numpy | >=1.21 | 数值计算 |
-| scipy | >=1.7 | 科学计算（Bessel函数等） |
-| matplotlib | >=3.5 | 2D/3D 可视化 |
-| plotly | >=5.0 | 交互式可视化 |
-| hcipy | >=0.7.0 | 光学仿真工具 |
-| LightPipes | >=2.0 | 光束传播仿真 |
-| PyYAML | >=6.0 | 配置文件解析 |
-| tqdm | >=4.60 | 进度条显示 |
-| pytest | >=7.0 | 单元测试 |
+| 包         | 最低版本 | 用途                     |
+| ---------- | -------- | ------------------------ |
+| numpy      | >=1.21   | 数值计算                 |
+| scipy      | >=1.7    | 科学计算（Bessel函数等） |
+| matplotlib | >=3.5    | 2D/3D 可视化             |
+| plotly     | >=5.0    | 交互式可视化             |
+| hcipy      | >=0.7.0  | 光学仿真工具             |
+| LightPipes | >=2.0    | 光束传播仿真             |
+| PyYAML     | >=6.0    | 配置文件解析             |
+| tqdm       | >=4.60   | 进度条显示               |
+| pytest     | >=7.0    | 单元测试                 |
 
 ## 快速开始
 
@@ -118,11 +122,58 @@ conda activate optics_sim
 python examples/example1_fresnel.py     # 菲涅尔透镜设计
 python examples/example2_grating.py     # 光栅衍射分析
 python examples/example3_fp_cavity.py   # F-P腔透射分析
-python examples/example4_zernike.py     # Zernike像差仿真
+python examples/example4_zernike_interactive.py  # Zernike CLI交互
 python examples/example5_stereo.py      # 双目测距模块
+
+# 运行Zernike GUI交互工具
+python examples/zernike_gui.py
 ```
 
 运行后生成的图像将保存在 `figures/` 目录下对应的子文件夹中。
+
+### Zernike GUI 使用说明
+
+#### 启动方式
+
+**方式一：Python脚本**
+
+```bash
+python examples/zernike_gui.py
+```
+
+**方式二：独立可执行文件**
+直接双击运行 `dist/ZernikeViewer.exe`（无需安装Python环境）
+
+#### 功能说明
+
+1. **单项显示模式**
+
+   - 从列表中选择Zernike项（Z1-Z36）
+   - 支持2D热力图、3D曲面图、2D+3D组合显示
+2. **叠加显示模式**
+
+   - 点击"+ 添加项"添加叠加项
+   - 下拉框选择像差类型，输入框填写系数
+   - 支持多像差线性叠加，结果自动归一化
+   - 点击"加载预设"快速加载球差+离焦组合
+3. **参数说明**
+
+   - **编号**：Zernike多项式序号(Z1-Z36)，代表不同像差类型
+   - **系数**：该项像差的权重，决定其在总波前中的贡献比例
+   - **注**：结果自动归一化到[-1,1]，系数仅反映相对比例
+4. **保存图像**
+
+   - 点击"保存图像"按钮
+   - 选择本地路径和文件名
+   - 支持PNG格式，300 DPI高清输出
+
+#### 常见叠加组合
+
+| 组合类型      | 项           | 系数            | 说明             |
+| ------------- | ------------ | --------------- | ---------------- |
+| 初级球差+离焦 | Z4 + Z11     | 1.0 + 0.5       | 模拟最佳焦面     |
+| 彗差+像散     | Z7 + Z5      | 0.8 + 0.3       | 模拟轴外像差     |
+| 复杂像差      | Z4+Z5+Z7+Z11 | 1.0+0.5+0.3+0.2 | 接近实际光学系统 |
 
 ### 自定义参数
 
@@ -147,23 +198,29 @@ print(f"刻蚀深度: {lens.etch_depth()*1e9:.1f} nm")
 ## 输出示例
 
 ### 菲涅尔透镜
+
 - 相位分布图（连续/8阶量化）
 - 环带结构图
 
 ### 光栅衍射
+
 - 衍射角与入射角/波长/光栅周期的关系曲线
 - 衍射效率分布图
 
 ### F-P腔
+
 - 不同反射率下的透射率曲线
 - 精细度与反射率的关系
 - 多光谱范围透射率分析
 
 ### Zernike像差
+
 - 前36项像差 2D 热力图
 - 典型像差（离焦、彗差、像散、球差）3D 曲面图
+- 多像差叠加波前分布
 
 ### 双目测距
+
 - 光路布局图
 - 距离-视差关系曲线
 - 测距误差分析
@@ -173,3 +230,4 @@ print(f"刻蚀深度: {lens.etch_depth()*1e9:.1f} nm")
 - 图表使用中文字体（SimHei），请确保系统已安装黑体字体
 - 所有示例脚本会自动创建 `figures/` 输出目录
 - 参数单位统一使用国际单位制（m、rad 等）
+- GUI程序运行时会阻塞终端，关闭窗口即可释放
