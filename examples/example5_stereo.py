@@ -33,5 +33,5 @@ for d in [1, 2, 5, 10]:
     print(f"  @ {d}m: 视差={disp:.1f}px, 误差={err:.3f}m ({err/d*100:.1f}%)")
 
 os.makedirs("figures/imaging", exist_ok=True)
-plot_optical_layout(system, target_distance=5.0, save_path="figures/imaging/optical_layout.png")
-plot_error_analysis(system, save_path="figures/imaging/error_analysis.png")
+plot_optical_layout(system, target_distance=5.0, save_path="figures/imaging/光路布局.png")
+plot_error_analysis(system, save_path="figures/imaging/测距误差分析.png")

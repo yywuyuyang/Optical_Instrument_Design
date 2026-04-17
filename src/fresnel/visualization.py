@@ -43,23 +43,37 @@ def plot_phase_map(
 def plot_ring_structure(
     lens: FresnelLens,
     save_path: str | None = None,
+    max_rings: int | None = None,
 ) -> None:
     radii = lens.ring_radii()
+    n_rings = len(radii)
+    
+    if max_rings is not None and n_rings > max_rings:
+        indices = np.linspace(0, n_rings - 1, max_rings, dtype=int)
+        radii_display = radii[indices]
+        n_display = max_rings
+    else:
+        radii_display = radii
+        n_display = n_rings
+    
     theta = np.linspace(0, 2 * np.pi, 500)
 
     fig, ax = plt.subplots(figsize=(8, 8))
-    for i, r in enumerate(radii):
-        r_inner = radii[i - 1] if i > 0 else 0
-        x_outer = r * np.cos(theta) * 1e3
-        y_outer = r * np.sin(theta) * 1e3
-
+    
+    for i in range(n_display):
+        r_outer = radii_display[-(i+1)] if i < n_display else lens.radius
+        r_inner = radii_display[-(i+2)] if i+1 < n_display else 0
+        
+        x_outer = r_outer * np.cos(theta) * 1e3
+        y_outer = r_outer * np.sin(theta) * 1e3
+        x_inner = r_inner * np.cos(theta) * 1e3
+        y_inner = r_inner * np.sin(theta) * 1e3
+        
+        x = np.concatenate([x_outer, x_inner[::-1]])
+        y = np.concatenate([y_outer, y_inner[::-1]])
+        
         color = "lightblue" if i % 2 == 0 else "white"
-        ax.fill(x_outer, y_outer, color=color, edgecolor="black", linewidth=0.5)
-
-        if r_inner > 0:
-            x_inner = r_inner * np.cos(theta) * 1e3
-            y_inner = r_inner * np.sin(theta) * 1e3
-            ax.fill(x_inner, y_inner, color="white", edgecolor="black", linewidth=0.5)
+        ax.fill(x, y, color=color, edgecolor="black", linewidth=0.5)
 
     r_max_mm = lens.radius * 1e3
     ax.set_xlim(-r_max_mm * 1.1, r_max_mm * 1.1)
@@ -67,9 +81,15 @@ def plot_ring_structure(
     ax.set_aspect("equal")
     ax.set_xlabel("x (mm)")
     ax.set_ylabel("y (mm)")
+    
+    subtitle = f"({n_display}个环带"
+    if max_rings and n_rings > max_rings:
+        subtitle += f", 共{n_rings}个)"
+    else:
+        subtitle += ")"
     ax.set_title(
         f"菲涅尔透镜环带结构\n"
-        f"({len(radii)}个环带, f={lens.focal_length*1e3:.0f}mm, "
+        f"{subtitle}, f={lens.focal_length*1e3:.0f}mm, "
         f"λ={lens.wavelength*1e9:.0f}nm)"
     )
 

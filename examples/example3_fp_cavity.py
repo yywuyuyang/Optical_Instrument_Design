@@ -23,7 +23,7 @@ print(f"  Q值 @632nm: {cavity.q_factor(632e-9):.0f}")
 wl_range = np.linspace(600e-9, 660e-9, 5000)
 R_list = [0.5, 0.7, 0.9, 0.95, 0.99]
 os.makedirs("figures/interferometry", exist_ok=True)
-plot_transmission_comparison(cavity, R_list, wl_range, save_path="figures/interferometry/transmission_vs_R.png")
+plot_transmission_comparison(cavity, R_list, wl_range, save_path="figures/interferometry/透射率与反射率.png")
 
 spectral_ranges = [
     (400e-9, 800e-9, "可见光范围"),
@@ -31,4 +31,4 @@ spectral_ranges = [
     (630e-9, 635e-9, "窄带范围2"),
     (1000e-9, 2000e-9, "近红外范围"),
 ]
-plot_spectral_ranges(cavity, spectral_ranges, save_path="figures/interferometry/spectral_ranges.png")
+plot_spectral_ranges(cavity, spectral_ranges, save_path="figures/interferometry/多光谱透射率.png")

@@ -30,5 +30,5 @@ for m, angle in angles.items():
         print(f"  m={m:+d}: 无传播级次")
 
 os.makedirs("figures/grating", exist_ok=True)
-plot_diffraction_angles(grating, save_path="figures/grating/diffraction_angles.png")
-plot_efficiency(grating, phase_depth=2.0, duty_cycle=0.5, save_path="figures/grating/efficiency.png")
+plot_diffraction_angles(grating, save_path="figures/grating/衍射角分布.png")
+plot_efficiency(grating, phase_depth=2.0, duty_cycle=0.5, save_path="figures/grating/衍射效率.png")

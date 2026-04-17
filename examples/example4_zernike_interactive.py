@@ -132,7 +132,7 @@ def interactive_menu():
             from src.wavefront.zernike import plot_zernike_modes
             print("正在生成36项Zernike多项式概览图...")
             plot_zernike_modes(noll_max=36, resolution=256, 
-                             save_path="figures/wavefront/zernike_36.png")
+                             save_path="figures/wavefront/Zernike36项概览.png")
                 
         elif choice == "2":
             try:
@@ -174,18 +174,18 @@ if __name__ == "__main__":
             for j in args.j:
                 if 1 <= j <= 36:
                     if args.mode == "2d":
-                        plot_zernike_2d(j, save_path=f"figures/wavefront/zernike_2d_Z{j}.png")
+                        plot_zernike_2d(j, save_path=f"figures/wavefront/Z{j}_{ABERRATION_NAMES[j-1]}2D.png")
                     elif args.mode == "3d":
-                        plot_zernike_3d(j, save_path=f"figures/wavefront/zernike_3d_Z{j}.png")
+                        plot_zernike_3d(j, save_path=f"figures/wavefront/Z{j}_{ABERRATION_NAMES[j-1]}3D.png")
                     elif args.mode == "combined":
-                        plot_zernike_combined(j, save_path=f"figures/wavefront/zernike_combined_Z{j}.png")
+                        plot_zernike_combined(j, save_path=f"figures/wavefront/Z{j}_{ABERRATION_NAMES[j-1]}组合.png")
                 else:
                     print(f"警告：Z{j} 超出范围 (1-36)，已跳过")
         else:
             # 默认显示所有36项概览
             from src.wavefront.zernike import plot_zernike_modes
             plot_zernike_modes(noll_max=36, resolution=256, 
-                             save_path="figures/wavefront/zernike_36.png")
+                             save_path="figures/wavefront/Zernike36项概览.png")
     else:
         # 交互式模式
         interactive_menu()

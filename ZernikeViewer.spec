@@ -3,10 +3,14 @@ from PyInstaller.utils.hooks import collect_all
 
 datas = [('config', 'config'), ('src', 'src'), ('D:/anaconda3/envs/optics_sim/Library/bin/ffi.dll', '.'), ('D:/anaconda3/envs/optics_sim/Library/bin/tcl86t.dll', '.'), ('D:/anaconda3/envs/optics_sim/Library/bin/tk86t.dll', '.'), ('D:/anaconda3/envs/optics_sim/Library/bin/libexpat.dll', '.'), ('D:/anaconda3/envs/optics_sim/Library/bin/libcrypto-3-x64.dll', '.'), ('D:/anaconda3/envs/optics_sim/Library/bin/libssl-3-x64.dll', '.'), ('D:/anaconda3/envs/optics_sim/Library/bin/liblzma.dll', '.'), ('D:/anaconda3/envs/optics_sim/Library/bin/libbz2.dll', '.')]
 binaries = []
-hiddenimports = ['src.wavefront.zernike']
+hiddenimports = ['src.wavefront.zernike', 'ctypes', '_ctypes', 'ctypes.util']
 tmp_ret = collect_all('matplotlib')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 tmp_ret = collect_all('PIL')
+datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+tmp_ret = collect_all('ctypes')
+datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+tmp_ret = collect_all('_ctypes')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 
 
