@@ -68,7 +68,8 @@ Optical_Instrument_Design/
 │   ├── example4_zernike_interactive.py  # Zernike CLI交互工具
 │   ├── example5_stereo.py      # 双目测距示例
 │   ├── zernike_gui.py          # Zernike GUI交互工具
-│   └── fresnel_gui.py          # 菲涅尔透镜设计GUI（Plotly渲染）
+│   ├── fresnel_gui.py          # 菲涅尔透镜设计GUI（Plotly渲染）
+│   └── grating_gui.py         # 光栅衍射分析GUI
 ├── figures/                    # 输出图像
 │   ├── fresnel/
 │   ├── grating/
@@ -265,6 +266,48 @@ python examples/fresnel_gui.py
    - 支持保存3D结构和设计总览为PNG图片
    - 可选择本地路径和文件名
    - 支持导出 Plotly 交互式 HTML 文件
+
+### 光栅衍射分析GUI
+
+#### 启动方式
+
+```bash
+python examples/grating_gui.py
+```
+
+#### 功能说明
+
+1. **参数设置**
+
+   - 光栅周期 d (μm)：决定衍射角大小
+   - 波长 λ (nm)：入射光波长
+   - 入射角 θi (°)：光线与光栅法线的夹角
+   - 最大级次 m：计算的衍射级次范围
+   - 点击"?"按钮查看参数说明
+
+2. **光栅类型配置**
+
+   - 正弦相位光栅：基于Bessel函数的效率计算
+   - 振幅型光栅：基于sinc函数的效率计算
+   - 矩形相位光栅：基于傅里叶级数的效率计算
+
+3. **多标签页可视化**
+
+   - **衍射光场分布**：显示光栅结构和各衍射级次的光路示意图
+   - **效率分析**：显示各衍射级次的效率分布柱状图
+   - **角度关系**：衍射角与入射角、波长关系的曲线图
+   - **参数扫描**：光栅周期、相位深度、占空比、入射角对效率的影响
+
+4. **计算结果**
+
+   - 实时显示各衍射级次的衍射角和效率
+   - 光栅方程验证
+
+5. **保存图像**
+
+   - 点击"保存图像"按钮
+   - 自动保存当前标签页的图像
+   - 支持PNG、PDF、SVG格式，300 DPI高清输出
 
 各模块支持自定义参数，例如：
 

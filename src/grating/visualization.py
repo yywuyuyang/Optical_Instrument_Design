@@ -8,7 +8,7 @@ def plot_diffraction_angles(
     grating: DiffractionGrating,
     save_path: str | None = None,
 ) -> None:
-    fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+    fig, axes = plt.subplots(1, 3, figsize=(18, 5), constrained_layout=True)
 
     theta_i_range = np.linspace(-np.pi / 3, np.pi / 3, 200)
     for m in range(-grating.max_order, grating.max_order + 1):
@@ -60,7 +60,6 @@ def plot_diffraction_angles(
     axes[2].set_title("衍射角与光栅周期的关系")
     axes[2].legend(fontsize=8, ncol=2)
 
-    plt.tight_layout()
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches="tight")
     plt.show()
@@ -72,7 +71,7 @@ def plot_efficiency(
     duty_cycle: float = 0.5,
     save_path: str | None = None,
 ) -> None:
-    fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+    fig, axes = plt.subplots(1, 3, figsize=(18, 5), constrained_layout=True)
 
     orders = list(range(-grating.max_order, grating.max_order + 1))
 
@@ -97,7 +96,6 @@ def plot_efficiency(
     axes[2].set_title("正弦相位光栅：衍射效率与相位深度的关系")
     axes[2].legend()
 
-    plt.tight_layout()
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches="tight")
     plt.show()
