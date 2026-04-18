@@ -34,10 +34,6 @@ class FPCavityGUI:
         self.R_list = [0.5, 0.7, 0.9, 0.95, 0.99]
         self.wl_base = tk.DoubleVar(value=632.0)
 
-        self.figures = {}
-        self.canvases = {}
-        self.R_checkboxes = {}
-
         self.setup_ui()
         self.update_all_plots()
 
@@ -100,26 +96,11 @@ class FPCavityGUI:
         R_config_frame = ttk.LabelFrame(left_panel, text="反射率对比列表 R0", padding="8")
         R_config_frame.pack(fill=tk.X, pady=(0, 8))
 
-        ttk.Label(R_config_frame, text="勾选要对比的反射率:", font=("Microsoft YaHei", 9)).pack(anchor=tk.W, pady=(0, 5))
-
-        R_presets = [0.5, 0.6, 0.7, 0.8, 0.85, 0.9, 0.92, 0.95, 0.97, 0.99]
-        for R_val in R_presets:
-            var = tk.BooleanVar(value=R_val in self.R_list)
-            cb = ttk.Checkbutton(R_config_frame, text=f"R = {R_val:.2f}", variable=var,
-                                 command=self.on_R_list_change)
-            cb.pack(anchor=tk.W, pady=1)
-            self.R_checkboxes[R_val] = var
-
-        guide_text = """说明:
-勾选多个R值后，查看右侧
-"不同R0透射率曲线"标签页，
-可对比不同反射率下的透射
-光谱。R值越高，透射峰越
-尖锐，精细度越大。"""
-        guide_label = ttk.Label(R_config_frame, text=guide_text, justify=tk.LEFT,
-                                wraplength=260, font=("Microsoft YaHei", 8),
-                                foreground="#666666")
-        guide_label.pack(anchor=tk.W, pady=(8, 0))
+        ttk.Label(R_config_frame, text="输入反射率列表(逗号分隔):").pack(anchor=tk.W)
+        self.R_list_entry = ttk.Entry(R_config_frame,
+                                       textvariable=tk.StringVar(value=", ".join(map(str, self.R_list))))
+        self.R_list_entry.pack(fill=tk.X, pady=(5, 5))
+        self.R_list_entry.bind("<Return>", lambda e: self.on_R_list_change())
 
         wl_frame = ttk.LabelFrame(left_panel, text="光谱范围配置", padding="8")
         wl_frame.pack(fill=tk.X, pady=(0, 8))
@@ -127,32 +108,30 @@ class FPCavityGUI:
         ttk.Label(wl_frame, text="中心波长 lambda0 (nm):").pack(anchor=tk.W)
         ttk.Entry(wl_frame, textvariable=self.wl_base, width=10).pack(anchor=tk.W, pady=(3, 0))
 
-        self.notebook = ttk.Notebook(right_panel)
-        self.notebook.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        desc_frame = ttk.LabelFrame(left_panel, text="图像说明", padding="10")
+        desc_frame.pack(fill=tk.BOTH, expand=True)
 
-        tab_configs = [
-            ("不同R0透射率曲线", "显示不同反射率R0下的透射率光谱曲线。\n反射率越高，透射峰越尖锐，精细度越大。"),
-            ("精细度与反射率", "显示精细度F与反射率R的关系：F = π√R/(1-R)。\n反射率接近1时，精细度急剧增加。"),
-            ("可见光范围", "显示可见光范围(400-800nm)内的透射特性。\n红色虚线标记共振波长位置。"),
-            ("窄带范围", "显示中心波长附近±2%窄带范围内的透射特性。\n用于观察单峰透射行为。"),
-            ("近红外范围", "显示近红外范围(1000-2000nm)内的透射特性。\n波长越长，自由光谱范围(FSR)越小。"),
-        ]
+        desc_text = """【图1】不同R0的透射率曲线
+左图：不同反射率下的透射率光谱，
+R越高→峰越尖锐（精细度越高）
+右图：精细度F随R的变化关系
 
-        for name, desc in tab_configs:
-            tab_frame = ttk.Frame(self.notebook)
-            self.notebook.add(tab_frame, text=name)
-            
-            fig_frame = ttk.Frame(tab_frame)
-            fig_frame.pack(fill=tk.BOTH, expand=True)
-            
-            self.figures[name] = plt.figure(figsize=(8, 6), constrained_layout=True)
-            self.canvases[name] = FigureCanvasTkAgg(self.figures[name], master=fig_frame)
-            self.canvases[name].get_tk_widget().pack(fill=tk.BOTH, expand=True)
-            
-            desc_label = ttk.Label(tab_frame, text=desc, justify=tk.LEFT,
-                                   wraplength=700, font=("Microsoft YaHei", 9),
-                                   foreground="#555555")
-            desc_label.pack(fill=tk.X, padx=10, pady=(5, 8))
+【图2】不同光谱范围的透射特性
+可见光/窄带/近红外等范围的
+透射率曲线，展示共振峰分布"""
+
+        desc_label = ttk.Label(desc_frame, text=desc_text, justify=tk.LEFT,
+                               wraplength=290, font=("Microsoft YaHei", 9))
+        desc_label.pack(anchor=tk.W)
+
+        plot_frame = ttk.LabelFrame(right_panel, text="透射光场分析", padding="10")
+        plot_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        plot_frame.columnconfigure(0, weight=1)
+        plot_frame.rowconfigure(0, weight=1)
+
+        self.fig = plt.figure(figsize=(15, 9), constrained_layout=True)
+        self.canvas = FigureCanvasTkAgg(self.fig, master=plot_frame)
+        self.canvas.get_tk_widget().grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
 
     def get_cavity(self):
         return FabryPerotCavity(
@@ -171,10 +150,27 @@ class FPCavityGUI:
             pass
 
     def on_R_list_change(self):
-        self.R_list = sorted([R for R, var in self.R_checkboxes.items() if var.get()])
-        if len(self.R_list) == 0:
+        try:
+            # 从输入框获取反射率列表
+            input_text = self.R_list_entry.get().strip()
+            if input_text:
+                # 解析输入的反射率值
+                values = [float(val.strip()) for val in input_text.split(",")]
+                # 过滤无效值并排序
+                self.R_list = sorted([R for R in values if 0 < R < 1])
+                if not self.R_list:
+                    self.R_list = [0.95]
+                    self.R_list_entry.delete(0, tk.END)
+                    self.R_list_entry.insert(0, "0.95")
+            else:
+                self.R_list = [0.95]
+                self.R_list_entry.delete(0, tk.END)
+                self.R_list_entry.insert(0, "0.95")
+        except Exception:
+            # 解析错误时使用默认值
             self.R_list = [0.95]
-            self.R_checkboxes[0.95].set(True)
+            self.R_list_entry.delete(0, tk.END)
+            self.R_list_entry.insert(0, "0.95")
         self.update_all_plots()
 
     def update_result_display(self):
@@ -208,59 +204,58 @@ class FPCavityGUI:
         cavity = self.get_cavity()
         wl0 = self.wl_base.get() * 1e-9
 
+        # 清空当前图形
+        self.fig.clear()
+
+        # 第一行：不同R0的透射率曲线和精细度关系
+        gs = self.fig.add_gridspec(2, 3, width_ratios=[2, 1, 1])
+
+        # 左图：不同R0的透射率曲线
+        ax1 = self.fig.add_subplot(gs[0, 0])
         wl_range = np.linspace(600e-9, 660e-9, 5000)
         colors = plt.cm.viridis(np.linspace(0.1, 0.9, len(self.R_list)))
-        results = cavity.plot_transmission_comparison(self.R_list, wl_range)
-
-        fig1 = self.figures["不同R0透射率曲线"]
-        fig1.clear()
-        ax1 = fig1.add_subplot(111)
         for R, color in zip(self.R_list, colors):
-            T = results[R]
+            T = cavity.transmission(wl_range, R=R)
             ax1.plot(wl_range * 1e9, T, label=f"R={R}", color=color, linewidth=1.5)
         ax1.set_xlabel("波长 (nm)")
         ax1.set_ylabel("透射率 T")
         ax1.set_title(f"不同反射率R0的透射率曲线\n(n={cavity.n}, h={cavity.h*1e6:.0f}um, theta={np.degrees(cavity.theta):.1f}deg)",
-                      fontsize=12)
-        ax1.legend(fontsize=9, loc='upper right')
+                      fontsize=10)
+        ax1.legend(fontsize=8, loc='upper right')
         ax1.set_ylim(-0.05, 1.05)
         ax1.grid(True, alpha=0.3)
-        self.canvases["不同R0透射率曲线"].draw()
 
-        fig2 = self.figures["精细度与反射率"]
-        fig2.clear()
-        ax2 = fig2.add_subplot(111)
+        # 右图：精细度与反射率的关系
+        ax2 = self.fig.add_subplot(gs[0, 1:])
         R_sweep = np.linspace(0.1, 0.999, 200)
         finesse_values = np.pi * np.sqrt(R_sweep) / (1 - R_sweep)
         ax2.semilogy(R_sweep, finesse_values, "b-", linewidth=2)
         for R in self.R_list:
             F = np.pi * np.sqrt(R) / (1 - R)
-            ax2.plot(R, F, "ro", markersize=8)
-            ax2.annotate(f"F={F:.1f}", xy=(R, F), fontsize=8,
+            ax2.plot(R, F, "ro", markersize=6)
+            ax2.annotate(f"F={F:.1f}", xy=(R, F), fontsize=7,
                          xytext=(R + 0.02, F * 1.3))
         ax2.set_xlabel("反射率 R0")
         ax2.set_ylabel("精细度 F")
-        ax2.set_title("精细度与反射率的关系\nF = pi*sqrt(R)/(1-R)", fontsize=12)
+        ax2.set_title("精细度与反射率的关系\nF = π√R/(1-R)", fontsize=10)
         ax2.grid(True, alpha=0.3)
-        self.canvases["精细度与反射率"].draw()
 
+        # 第二行：不同光谱范围的透射特性
         spectral_ranges = [
             ("可见光范围", 400e-9, 800e-9),
             ("窄带范围", wl0 * 0.98, wl0 * 1.02),
             ("近红外范围", 1000e-9, 2000e-9),
         ]
 
-        for name, lam_min, lam_max in spectral_ranges:
-            fig = self.figures[name]
-            fig.clear()
-            ax = fig.add_subplot(111)
+        for i, (name, lam_min, lam_max) in enumerate(spectral_ranges):
+            ax = self.fig.add_subplot(gs[1, i])
             wl = np.linspace(lam_min, lam_max, 3000)
             T = cavity.transmission(wl)
             ax.plot(wl * 1e9, T, 'b-', linewidth=1.2)
             ax.fill_between(wl * 1e9, T, alpha=0.15, color='blue')
             ax.set_xlabel("波长 (nm)")
             ax.set_ylabel("透射率 T")
-            ax.set_title(f"{name} ({lam_min*1e9:.0f}-{lam_max*1e9:.0f}nm)", fontsize=12)
+            ax.set_title(f"{name} ({lam_min*1e9:.0f}-{lam_max*1e9:.0f}nm)", fontsize=9)
             ax.set_ylim(-0.05, 1.05)
             ax.grid(True, alpha=0.3)
 
@@ -270,21 +265,20 @@ class FPCavityGUI:
                     if lam_min <= rw <= lam_max:
                         ax.axvline(rw * 1e9, color='red', linestyle='--', alpha=0.5, linewidth=0.8)
 
-            self.canvases[name].draw()
-
+        # 调整布局
+        self.fig.tight_layout()
+        self.canvas.draw()
         self.update_result_display()
 
     def save_current_image(self):
-        current_tab = self.notebook.tab(self.notebook.select(), "text")
-
         filepath = filedialog.asksaveasfilename(
             title="保存图像",
-            initialfile=f"fp_cavity_{current_tab}.png",
+            initialfile=f"fp_cavity_analysis.png",
             defaultextension=".png",
             filetypes=[("PNG图像", "*.png"), ("PDF文档", "*.pdf"), ("所有文件", "*.*")]
         )
         if filepath:
-            self.figures[current_tab].savefig(filepath, dpi=300, bbox_inches="tight")
+            self.fig.savefig(filepath, dpi=300, bbox_inches="tight")
             messagebox.showinfo("保存成功", f"图像已保存到:\n{filepath}")
 
 
