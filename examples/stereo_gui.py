@@ -14,7 +14,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from src.imaging.stereo import StereoRangingSystem
-from src.imaging.visualization import plot_optical_layout, plot_error_analysis
 
 style_path = os.path.join(BASE_DIR, "config", "optics_style.mplstyle")
 if os.path.exists(style_path):
@@ -229,14 +228,61 @@ class StereoRangingGUI:
         # 更新标签页1：光路布局
         self.layout_fig.clear()
         ax1 = self.layout_fig.add_subplot(111)
-        plot_optical_layout(system, target_distance=5.0, save_path=None, ax=ax1)
+        
+        B = system.baseline
+        f = system.focal_length
+        fov_h = system.fov_horizontal()
+        target_distance = 5.0
+        
+        ax1.plot([-B / 2, -B / 2], [0, 0], "ro", markersize=10, label="左相机")
+        ax1.plot([B / 2, B / 2], [0, 0], "bo", markersize=10, label="右相机")
+        ax1.plot([0, 0], [0, 0], "k+", markersize=12, markeredgewidth=2)
+        
+        ax1.annotate("", xy=(-B / 2, 0), xytext=(B / 2, 0),
+                     arrowprops=dict(arrowstyle="<->", color="green", lw=2))
+        ax1.text(0, -0.15, f"B={B*1e3:.0f}mm", ha="center", fontsize=10, color="green")
+        
+        half_w = target_distance * np.tan(fov_h / 2)
+        ax1.plot([-B / 2, -half_w], [0, target_distance], "r--", alpha=0.4)
+        ax1.plot([-B / 2, half_w], [0, target_distance], "r--", alpha=0.4)
+        ax1.plot([B / 2, -half_w], [0, target_distance], "b--", alpha=0.4)
+        ax1.plot([B / 2, half_w], [0, target_distance], "b--", alpha=0.4)
+        
+        ax1.plot([0, 0], [0, target_distance], "k--", alpha=0.3, label="光轴")
+        ax1.plot(0, target_distance, "g^", markersize=12, label=f"目标 ({target_distance}m)")
+        
+        ax1.set_xlim(-2.5, 2.5)
+        ax1.set_ylim(-0.5, target_distance * 1.2)
+        ax1.set_xlabel("水平位置 (m)")
+        ax1.set_ylabel("距离 (m)")
+        ax1.set_title(
+            f"双目视觉系统光路图\n"
+            f"视场角={np.degrees(fov_h):.1f}°, f={f*1e3:.1f}mm"
+        )
+        ax1.legend(loc="center left", bbox_to_anchor=(1.0, 0.5), borderaxespad=0)
+        ax1.set_aspect("equal")
+        ax1.grid(True, alpha=0.3)
+        
         self.layout_fig.suptitle(f'双目测距光路布局\n基线长度: {system.baseline*1e3:.1f}mm, 焦距: {system.focal_length*1e3:.1f}mm', fontsize=12, fontweight='bold')
         self.layout_canvas.draw()
 
         # 更新标签页2：误差分析
         self.error_fig.clear()
         ax2 = self.error_fig.add_subplot(111)
-        plot_error_analysis(system, save_path=None, ax=ax2)
+        
+        distance_range = np.linspace(0.5, 10, 200)
+        disparity = system.disparity_from_distance(distance_range)
+        ax2.plot(distance_range, disparity, "b-", linewidth=2)
+        for d in [1, 2, 5, 10]:
+            disp = system.disparity_from_distance(d)
+            ax2.annotate(f"{d}m: {disp:.1f}px", xy=(d, disp),
+                         xytext=(d + 0.3, disp + 5), fontsize=9,
+                         arrowprops=dict(arrowstyle="->", color="red"))
+        ax2.set_xlabel("距离 (m)")
+        ax2.set_ylabel("视差 (像素)")
+        ax2.set_title("距离与视差的关系")
+        ax2.grid(True, alpha=0.3)
+        
         self.error_fig.suptitle('测距误差分析', fontsize=12, fontweight='bold')
         self.error_canvas.draw()
 

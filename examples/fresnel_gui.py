@@ -2,7 +2,13 @@ import sys
 import os
 import tempfile
 import webbrowser
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+if getattr(sys, "frozen", False):
+    BASE_DIR = sys._MEIPASS
+else:
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+sys.path.insert(0, BASE_DIR)
 
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
@@ -15,7 +21,9 @@ import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import plotly.io as pio
 
-plt.style.use("config/optics_style.mplstyle")
+style_path = os.path.join(BASE_DIR, "config", "optics_style.mplstyle")
+if os.path.exists(style_path):
+    plt.style.use(style_path)
 
 from src.fresnel.lens import FresnelLens
 

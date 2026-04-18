@@ -2,55 +2,6 @@
 
 基于 Python 的光学仪器设计与仿真平台，涵盖菲涅尔透镜设计、光栅衍射分析、F-P腔透射分析、Zernike像差仿真和双目测距模块设计五大核心功能。
 
-## 功能模块
-
-### 1. 菲涅尔透镜设计 (`src/fresnel/`)
-
-针对波长 632nm 的激光，设计焦距 100mm 的菲涅尔透镜。
-
-- 计算环带半径分布
-- 生成相位分布图（连续/量化）
-- 可视化环带结构
-- 计算刻蚀深度、F数、焦点光斑尺寸等关键参数
-- **交互式GUI**：支持参数实时修改、Plotly WebGL加速3D可视化
-
-### 2. 平面光栅衍射分析 (`src/grating/`)
-
-根据入射角、波长、光栅周期计算衍射角和衍射效率。
-
-- 多衍射级次的衍射角计算
-- 正弦相位光栅和振幅型光栅的效率计算
-- 矩形相位光栅的傅里叶级数效率公式
-- 衍射角/效率随入射角、波长、光栅周期的变化曲线
-
-### 3. F-P腔透射分析 (`src/interferometry/`)
-
-分析 Fabry-Perot 腔的透射光场特性。
-
-- 不同反射率下的透射率曲线
-- 不同光谱范围的透射率分析
-- 精细度、自由光谱范围(FSR)、半高全宽(FWHM)、Q值计算
-- 共振波长定位
-- **GUI交互工具**：支持参数实时修改、多R值对比、光谱分析
-
-### 4. Zernike像差仿真 (`src/wavefront/`)
-
-基于 Zernike 多项式（前36项）的像差表征与可视化。
-
-- 前36项 Zernike 多项式的空间分布
-- 2D 热力图与 3D 曲面图可视化
-- 涵盖离焦、像散、彗差、球差等经典像差类型
-- **GUI交互工具**：支持单项显示、多像差叠加、自定义保存路径
-
-### 5. 双目测距模块设计 (`src/imaging/`)
-
-基于人眼视觉感知距离原理的双成像单元测距模块。
-
-- 视差-距离关系计算
-- 测距误差分析（绝对误差/相对误差）
-- 基线长度对视差的影响
-- 光路布局可视化
-
 ## 项目结构
 
 ```
@@ -59,7 +10,10 @@ Optical_Instrument_Design/
 │   ├── default_params.yaml     # 默认参数配置
 │   └── optics_style.mplstyle   # Matplotlib 样式（中文字体）
 ├── dist/                       # 打包后的可执行文件
-│   ├── FPCavityAnalyzer.exe   # F-P腔分析 GUI 独立程序
+│   ├── FPCavityAnalyzer.exe    # F-P腔分析 GUI 独立程序
+│   ├── FresnelLensAnalyzer.exe # 菲涅尔透镜设计 GUI 独立程序
+│   ├── GratingAnalyzer.exe     # 光栅衍射分析 GUI 独立程序
+│   ├── StereoRangingAnalyzer.exe # 双目测距分析 GUI 独立程序
 │   └── ZernikeViewer.exe       # Zernike GUI 独立程序
 ├── examples/                   # 示例脚本
 │   ├── example1_fresnel.py     # 菲涅尔透镜示例
@@ -67,16 +21,12 @@ Optical_Instrument_Design/
 │   ├── example3_fp_cavity.py   # F-P腔示例
 │   ├── example4_zernike_interactive.py  # Zernike CLI交互工具
 │   ├── example5_stereo.py      # 双目测距示例
-│   ├── zernike_gui.py          # Zernike GUI交互工具
+│   ├── fp_cavity_gui.py        # F-P腔分析GUI
 │   ├── fresnel_gui.py          # 菲涅尔透镜设计GUI（Plotly渲染）
-│   ├── grating_gui.py         # 光栅衍射分析GUI
-│   └── stereo_gui.py          # 双目测距系统分析GUI
+│   ├── grating_gui.py          # 光栅衍射分析GUI
+│   ├── stereo_gui.py           # 双目测距系统分析GUI
+│   └── zernike_gui.py          # Zernike GUI交互工具
 ├── figures/                    # 输出图像
-│   ├── fresnel/
-│   ├── grating/
-│   ├── imaging/
-│   ├── interferometry/
-│   └── wavefront/
 ├── src/                        # 核心源代码
 │   ├── fresnel/                # 菲涅尔透镜模块
 │   ├── grating/                # 光栅衍射模块
@@ -84,7 +34,6 @@ Optical_Instrument_Design/
 │   ├── wavefront/              # Zernike像差模块
 │   └── imaging/                # 双目测距模块
 ├── requirements.txt            # Python 依赖
-├── ZernikeViewer.spec          # PyInstaller 打包配置
 └── README.md
 ```
 
@@ -111,15 +60,14 @@ pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 | scipy      | >=1.7    | 科学计算（Bessel函数等） |
 | matplotlib | >=3.5    | 2D 可视化               |
 | plotly     | >=5.0    | WebGL交互式3D可视化      |
-| hcipy      | >=0.7.0  | 光学仿真工具             |
-| LightPipes | >=2.0    | 光束传播仿真             |
 | PyYAML     | >=6.0    | 配置文件解析             |
 | tqdm       | >=4.60   | 进度条显示               |
 | pytest     | >=7.0    | 单元测试                 |
+| pyinstaller| >=6.0    | 打包为可执行文件         |
 
 ## 快速开始
 
-### 运行示例
+### 运行示例脚本
 
 ```bash
 # 激活环境
@@ -131,234 +79,85 @@ python examples/example2_grating.py     # 光栅衍射分析
 python examples/example3_fp_cavity.py   # F-P腔透射分析
 python examples/example4_zernike_interactive.py  # Zernike CLI交互
 python examples/example5_stereo.py      # 双目测距模块
-
-# 运行Zernike GUI交互工具
-python examples/zernike_gui.py
-
-# 运行菲涅尔透镜设计GUI（Plotly 3D渲染）
-python examples/fresnel_gui.py
 ```
 
-运行后生成的图像将保存在 `figures/` 目录下对应的子文件夹中。
-
-### F-P腔分析GUI
-
-#### 启动方式
-
-**方式一：Python脚本**
+### 运行 GUI 工具
 
 ```bash
+# F-P腔分析GUI
 python examples/fp_cavity_gui.py
-```
 
-**方式二：独立可执行文件**
-直接双击运行 `dist/FPCavityAnalyzer.exe`（无需安装Python环境）
+# 菲涅尔透镜设计GUI（Plotly 3D渲染）
+python examples/fresnel_gui.py
 
-#### 功能说明
+# 光栅衍射分析GUI
+python examples/grating_gui.py
 
-1. **参数设置**
+# 双目测距系统分析GUI
+python examples/stereo_gui.py
 
-   - 反射率 R：镜面反射率(0~1)，越高精细度越大
-   - 腔长 h：两镜面间距，决定FSR
-   - 折射率 n：腔内介质折射率
-   - 入射角 theta：光线入射角度
-   - 点击"?"按钮查看参数说明
-2. **多R值对比**
-
-   - 勾选多个反射率值进行对比
-   - 查看不同反射率下的透射光谱
-   - R值越高，透射峰越尖锐，精细度越大
-3. **光谱分析**
-
-   - 精细度与反射率的关系曲线
-   - 可见光范围(400-800nm)透射特性
-   - 窄带范围±2%透射特性
-   - 近红外范围(1000-2000nm)透射特性
-4. **计算结果**
-
-   - 精细度 F
-   - 自由光谱范围(FSR)
-   - 半高全宽(FWHM)
-   - Q值
-   - 共振波长定位
-5. **保存图像**
-
-   - 点击"保存当前图像"按钮
-   - 支持PNG和PDF格式，300 DPI高清输出
-
-### Zernike GUI 使用说明
-
-#### 启动方式
-
-**方式一：Python脚本**
-
-```bash
+# Zernike GUI交互工具
 python examples/zernike_gui.py
 ```
 
-**方式二：独立可执行文件**
-直接双击运行 `dist/ZernikeViewer.exe`（无需安装Python环境）
+### 使用独立可执行文件
 
-#### 功能说明
+直接双击运行 `dist/` 目录下的 `.exe` 文件，无需安装 Python 环境。
 
-1. **单项显示模式**
+---
 
-   - 从列表中选择Zernike项（Z1-Z36）
-   - 支持2D热力图、3D曲面图、2D+3D组合显示
-2. **叠加显示模式**
+## 模块一：菲涅尔透镜设计
 
-   - 点击"+ 添加项"添加叠加项
-   - 下拉框选择像差类型，输入框填写系数
-   - 支持多像差线性叠加，结果自动归一化
-   - 点击"加载预设"快速加载球差+离焦组合
-3. **参数说明**
+### 数学与光学原理
 
-   - **编号**：Zernike多项式序号(Z1-Z36)，代表不同像差类型
-   - **系数**：该项像差的权重，决定其在总波前中的贡献比例
-   - **注**：结果自动归一化到[-1,1]，系数仅反映相对比例
-4. **保存图像**
+**菲涅尔透镜**是一种将传统透镜的连续曲面分解为一系列同心环带的平面光学元件。每个环带相当于原透镜的一个局部，通过阶梯状刻蚀实现相位调制。
 
-   - 点击"保存图像"按钮
-   - 选择本地路径和文件名
-   - 支持PNG格式，300 DPI高清输出
+#### 1. 环带半径公式
 
-#### 常见叠加组合
+菲涅尔透镜的环带半径由以下公式给出：
 
-| 组合类型      | 项           | 系数            | 说明             |
-| ------------- | ------------ | --------------- | ---------------- |
-| 初级球差+离焦 | Z4 + Z11     | 1.0 + 0.5       | 模拟最佳焦面     |
-| 彗差+像散     | Z7 + Z5      | 0.8 + 0.3       | 模拟轴外像差     |
-| 复杂像差      | Z4+Z5+Z7+Z11 | 1.0+0.5+0.3+0.2 | 接近实际光学系统 |
-
-### 菲涅尔透镜设计GUI
-
-#### 启动方式
-
-```bash
-python examples/fresnel_gui.py
+```
+r_n = √(n · λ · f)
 ```
 
-#### 功能说明
+其中：
+- `r_n`：第 n 个环带的半径
+- `n`：环带序号（1, 2, 3, ...）
+- `λ`：工作波长
+- `f`：焦距
 
-1. **参数输入**
+#### 2. 刻蚀深度
 
-   - 波长 λ (nm)：激光波长，决定相位周期和刻蚀深度
-   - 焦距 f (mm)：焦点到透镜的距离
-   - 直径 D (mm)：透镜通光孔径
-   - 折射率 n：透镜材料折射率（如玻璃~1.5）
-   - 点击"?"按钮查看参数说明
-2. **实时可视化（Plotly WebGL 加速）**
+为了实现 2π 相位调制，刻蚀深度为：
 
-   - **3D透镜结构图**：采用 Plotly WebGL 渲染，GPU硬件加速
-   - **流畅交互**：鼠标拖拽旋转、滚轮缩放、右键平移，全程60fps无卡顿
-   - **浏览器打开**：点击按钮在浏览器中打开完整交互式3D模型
-   - **HTML导出**：支持导出为独立HTML文件，无需Python环境即可查看
-   - **设计总览图**：包含参数面板、环带半径曲线、相位分布、截面结构、2D相位热力图
-3. **设计结果**
-
-   - 自动计算：理论环带数、刻蚀深度、F数、光斑尺寸等
-   - 制造约束分析：可制造环带数（基于最小加工间距）、有效半径占比
-4. **图像说明**
-
-   - 左侧面板提供每张图像的详细解释
-   - 包括物理意义、数学公式、制造约束说明
-5. **保存功能**
-
-   - 支持保存3D结构和设计总览为PNG图片
-   - 可选择本地路径和文件名
-   - 支持导出 Plotly 交互式 HTML 文件
-
-### 光栅衍射分析GUI
-
-#### 启动方式
-
-```bash
-python examples/grating_gui.py
+```
+h = λ / (n - 1)
 ```
 
-#### 功能说明
+其中 `n` 为透镜材料的折射率。
 
-1. **参数设置**
+#### 3. F数与光斑尺寸
 
-   - 光栅周期 d (μm)：决定衍射角大小
-   - 波长 λ (nm)：入射光波长
-   - 入射角 θi (°)：光线与光栅法线的夹角
-   - 最大级次 m：计算的衍射级次范围
-   - 点击"?"按钮查看参数说明
-
-2. **光栅类型配置**
-
-   - 正弦相位光栅：基于Bessel函数的效率计算
-   - 振幅型光栅：基于sinc函数的效率计算
-   - 矩形相位光栅：基于傅里叶级数的效率计算
-
-3. **多标签页可视化**
-
-   - **衍射光场分布**：显示光栅结构和各衍射级次的光路示意图
-   - **效率分析**：显示各衍射级次的效率分布柱状图
-   - **角度关系**：衍射角与入射角、波长关系的曲线图
-   - **参数扫描**：光栅周期、相位深度、占空比、入射角对效率的影响
-
-4. **计算结果**
-
-   - 实时显示各衍射级次的衍射角和效率
-   - 光栅方程验证
-
-5. **保存图像**
-
-   - 点击"保存图像"按钮
-   - 自动保存当前标签页的图像
-   - 支持PNG、PDF、SVG格式，300 DPI高清输出
-
-### 双目测距系统分析GUI
-
-#### 启动方式
-
-```bash
-python examples/stereo_gui.py
+```
+F/# = f / D
+d_spot ≈ 2.44 · λ · F/#
 ```
 
-#### 功能说明
+其中 `D` 为透镜直径，`d_spot` 为艾里斑直径。
 
-1. **参数设置**
+#### 4. 相位分布
 
-   - 基线长度 (mm)：双相机之间的距离，影响测距精度和范围
-   - 焦距 (mm)：相机焦距，影响视场角和测距精度
-   - 像素尺寸 (μm)：像素大小，影响测距分辨率
-   - 图像宽度/高度 (px)：相机分辨率
-   - 点击"?"按钮查看参数说明
+菲涅尔透镜的相位分布为包裹相位：
 
-2. **多标签页可视化**
+```
+φ(r) = mod(π · r² / (λ · f), 2π)
+```
 
-   - **光路布局**：显示双目测距系统的光学布局和三角测量原理
-   - **误差分析**：显示测距误差随距离变化的曲线
-   - **参数关系**：分析基线长度、焦距、像素尺寸与系统性能的关系
-
-3. **系统参数计算**
-
-   - 实时显示视场角、最小/最大测距范围
-   - 计算不同距离下的视差和测距误差
-   - 显示误差百分比
-
-4. **测距原理**
-
-   - 基于三角测量原理：Z = (B × f) / d
-   - 基线越长：测距范围越大，精度越高
-   - 焦距越长：视场角越小，测距精度越高
-   - 像素尺寸越小：测距分辨率越高
-
-5. **保存图像**
-
-   - 点击"保存图像"按钮
-   - 自动保存当前标签页的图像
-   - 支持PNG、PDF、SVG格式，300 DPI高清输出
-
-各模块支持自定义参数，例如：
+### 使用方式
 
 ```python
 from src.fresnel.lens import FresnelLens
 
-# 自定义菲涅尔透镜参数
 lens = FresnelLens(
     focal_length=0.1,      # 焦距 (m)
     wavelength=632e-9,     # 波长 (m)
@@ -366,10 +165,275 @@ lens = FresnelLens(
     n=1.5,                 # 折射率
 )
 
-# 查看设计参数
 print(f"环带数量: {lens.num_rings()}")
 print(f"刻蚀深度: {lens.etch_depth()*1e9:.1f} nm")
 ```
+
+---
+
+## 模块二：平面光栅衍射分析
+
+### 数学与光学原理
+
+**衍射光栅**是一种具有周期性结构的光学元件，能够将入射光分解为多个衍射级次。
+
+#### 1. 光栅方程
+
+```
+d · sin(θ_m) = m · λ + d · sin(θ_i)
+```
+
+其中：
+- `d`：光栅周期
+- `θ_m`：第 m 级衍射角
+- `m`：衍射级次（整数）
+- `λ`：入射光波长
+- `θ_i`：入射角
+
+#### 2. 正弦相位光栅效率
+
+对于正弦相位光栅，第 m 级衍射效率为：
+
+```
+η_m = J_m²(δ/2)
+```
+
+其中 `J_m` 为 m 阶贝塞尔函数，`δ` 为相位调制深度。
+
+#### 3. 振幅型光栅效率
+
+对于振幅型光栅（矩形透过率函数）：
+
+```
+η_m = sinc²(m · a/d)
+```
+
+其中 `a` 为透光部分宽度，`d` 为光栅周期。
+
+#### 4. 矩形相位光栅效率
+
+对于矩形相位光栅（二元光学元件）：
+
+```
+η_m = sinc²(m · a/d) · sin²(δ/2) / (π · m)²
+```
+
+### 使用方式
+
+```python
+from src.grating.analysis import DiffractionGrating
+
+grating = DiffractionGrating(
+    period=1e-6,           # 光栅周期 (m)
+    wavelength=632e-9,     # 波长 (m)
+    incidence_angle=0.0,   # 入射角 (rad)
+    max_order=5,           # 最大衍射级次
+)
+
+# 计算衍射角
+angles = grating.diffraction_angles()
+
+# 计算效率（正弦相位光栅）
+efficiencies = grating.efficiency_sine_phase(phase_depth=np.pi)
+```
+
+---
+
+## 模块三：F-P腔透射分析
+
+### 数学与光学原理
+
+**法布里-珀罗（Fabry-Perot）腔**由两块平行的高反射率镜面组成，利用多光束干涉实现波长选择。
+
+#### 1. 透射率公式（Airy公式）
+
+```
+T = 1 / [1 + F · sin²(δ/2)]
+```
+
+其中：
+- `F = 4R / (1-R)²`：精细度系数
+- `R`：镜面反射率
+- `δ = 4πnh·cos(θ) / λ`：相邻光束的相位差
+- `n`：腔内介质折射率
+- `h`：腔长
+- `θ`：入射角
+
+#### 2. 自由光谱范围（FSR）
+
+```
+FSR = λ² / (2nh)
+```
+
+#### 3. 半高全宽（FWHM）
+
+```
+FWHM = FSR / ℱ
+```
+
+其中 `ℱ = π√F / 2` 为精细度。
+
+#### 4. 品质因数（Q值）
+
+```
+Q = λ / FWHM = 2πnh / [λ(1-R)]
+```
+
+### 使用方式
+
+```python
+from src.interferometry.fp_cavity import FabryPerotCavity
+
+cavity = FabryPerotCavity(
+    reflectivity=0.95,     # 反射率
+    cavity_length=1e-3,    # 腔长 (m)
+    refractive_index=1.0,  # 折射率
+    wavelength=632e-9,     # 工作波长 (m)
+)
+
+print(f"精细度: {cavity.finesse():.1f}")
+print(f"FSR: {cavity.fsr()*1e9:.2f} nm")
+print(f"FWHM: {cavity.fwhm()*1e9:.4f} nm")
+```
+
+---
+
+## 模块四：Zernike像差仿真
+
+### 数学与光学原理
+
+**Zernike多项式**是一组在单位圆上正交的多项式，广泛用于光学波前像差的表征。
+
+#### 1. Zernike多项式定义
+
+Zernike多项式在极坐标下表示为：
+
+```
+Z_n^m(ρ, θ) = R_n^m(ρ) · cos(mθ)  或  R_n^m(ρ) · sin(mθ)
+```
+
+其中径向多项式为：
+
+```
+R_n^m(ρ) = Σ [(-1)^k · (n-k)! / (k! · ((n+m)/2-k)! · ((n-m)/2-k)!)] · ρ^(n-2k)
+```
+
+#### 2. 常见像差类型
+
+| 序号 | 名称 | Zernike项 | 数学表达式 |
+|------|------|-----------|------------|
+| Z1 | 平移 | Z(0,0) | 常数 |
+| Z2 | 倾斜X | Z(1,1) | ρ·cos(θ) |
+| Z3 | 倾斜Y | Z(1,-1) | ρ·sin(θ) |
+| Z4 | 离焦 | Z(2,0) | 2ρ²-1 |
+| Z5 | 像散X | Z(2,-2) | ρ²·cos(2θ) |
+| Z6 | 像散Y | Z(2,2) | ρ²·sin(2θ) |
+| Z7 | 彗差X | Z(3,-1) | (3ρ³-2ρ)·cos(θ) |
+| Z8 | 彗差Y | Z(3,1) | (3ρ³-2ρ)·sin(θ) |
+| Z9 | 三叶草X | Z(3,-3) | ρ³·cos(3θ) |
+| Z10 | 三叶草Y | Z(3,3) | ρ³·sin(3θ) |
+| Z11 | 球差 | Z(4,0) | 6ρ⁴-6ρ²+1 |
+
+#### 3. 波前叠加
+
+任意波前可以表示为 Zernike 多项式的线性组合：
+
+```
+W(ρ, θ) = Σ a_i · Z_i(ρ, θ)
+```
+
+### 使用方式
+
+```python
+from src.wavefront.zernike import ZernikePolynomial
+
+# 计算单个Zernike项
+zernike = ZernikePolynomial(n=4, m=0)  # 球差
+wavefront = zernike.evaluate(rho, theta)
+
+# 多项叠加
+from src.wavefront.visualization import plot_zernike_superposition
+coefficients = {4: 1.0, 11: 0.5}  # Z4离焦 + Z11球差
+plot_zernike_superposition(coefficients)
+```
+
+---
+
+## 模块五：双目测距模块设计
+
+### 数学与光学原理
+
+**双目测距**基于三角测量原理，通过两个相机从不同视角观察同一目标，利用视差计算目标距离。
+
+#### 1. 三角测量公式
+
+```
+Z = (B · f) / d
+```
+
+其中：
+- `Z`：目标距离
+- `B`：基线长度（两相机间距）
+- `f`：相机焦距
+- `d`：视差（同一目标在两像面上的像素差）
+
+#### 2. 视差计算
+
+```
+d = (x_L - x_R) · (w / W_sensor)
+```
+
+其中 `x_L`、`x_R` 为目标在左右像面上的位置，`w` 为图像宽度（像素），`W_sensor` 为传感器宽度。
+
+#### 3. 测距误差
+
+对三角测量公式求微分，得到距离误差：
+
+```
+ΔZ = (B · f / d²) · Δd = Z² · Δd / (B · f)
+```
+
+相对误差为：
+
+```
+ΔZ/Z = Z · Δd / (B · f)
+```
+
+#### 4. 视场角
+
+```
+FOV_h = 2 · arctan(w · p / (2f))
+FOV_v = 2 · arctan(h · p / (2f))
+```
+
+其中 `p` 为像素尺寸，`w`、`h` 为图像宽高（像素）。
+
+#### 5. 可测距范围
+
+- **最小测距**（视差 = 1像素）：`Z_min = B · f / p`
+- **最大测距**（视差 = 0.1像素精度）：`Z_max = B · f / (0.1 · p)`
+
+### 使用方式
+
+```python
+from src.imaging.stereo import StereoRangingSystem
+
+system = StereoRangingSystem(
+    baseline=0.065,        # 基线长度 (m)
+    focal_length=0.008,    # 焦距 (m)
+    pixel_size=3.45e-6,    # 像素尺寸 (m)
+    image_width=1920,      # 图像宽度 (px)
+    image_height=1080,     # 图像高度 (px)
+)
+
+# 计算视差
+disparity = system.disparity_from_distance(5.0)
+
+# 计算测距误差
+error = system.range_error(5.0)
+```
+
+---
 
 ## 输出示例
 
@@ -419,4 +483,4 @@ print(f"刻蚀深度: {lens.etch_depth()*1e9:.1f} nm")
 - 所有示例脚本会自动创建 `figures/` 输出目录
 - 参数单位统一使用国际单位制（m、rad 等）
 - GUI程序运行时会阻塞终端，关闭窗口即可释放
-- 菲涅尔透镜GUI的3D功能依赖 Plotly 和浏览器环境，首次使用需安装 plotly 包
+- 菲涅尔透镜GUI的3D功能依赖 Plotly 和浏览器环境
