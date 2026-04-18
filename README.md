@@ -31,6 +31,7 @@
 - 不同光谱范围的透射率分析
 - 精细度、自由光谱范围(FSR)、半高全宽(FWHM)、Q值计算
 - 共振波长定位
+- **GUI交互工具**：支持参数实时修改、多R值对比、光谱分析
 
 ### 4. Zernike像差仿真 (`src/wavefront/`)
 
@@ -58,6 +59,7 @@ Optical_Instrument_Design/
 │   ├── default_params.yaml     # 默认参数配置
 │   └── optics_style.mplstyle   # Matplotlib 样式（中文字体）
 ├── dist/                       # 打包后的可执行文件
+│   ├── FPCavityAnalyzer.exe   # F-P腔分析 GUI 独立程序
 │   └── ZernikeViewer.exe       # Zernike GUI 独立程序
 ├── examples/                   # 示例脚本
 │   ├── example1_fresnel.py     # 菲涅尔透镜示例
@@ -136,6 +138,51 @@ python examples/fresnel_gui.py
 ```
 
 运行后生成的图像将保存在 `figures/` 目录下对应的子文件夹中。
+
+### F-P腔分析GUI
+
+#### 启动方式
+
+**方式一：Python脚本**
+
+```bash
+python examples/fp_cavity_gui.py
+```
+
+**方式二：独立可执行文件**
+直接双击运行 `dist/FPCavityAnalyzer.exe`（无需安装Python环境）
+
+#### 功能说明
+
+1. **参数设置**
+
+   - 反射率 R：镜面反射率(0~1)，越高精细度越大
+   - 腔长 h：两镜面间距，决定FSR
+   - 折射率 n：腔内介质折射率
+   - 入射角 theta：光线入射角度
+   - 点击"?"按钮查看参数说明
+2. **多R值对比**
+
+   - 勾选多个反射率值进行对比
+   - 查看不同反射率下的透射光谱
+   - R值越高，透射峰越尖锐，精细度越大
+3. **光谱分析**
+
+   - 精细度与反射率的关系曲线
+   - 可见光范围(400-800nm)透射特性
+   - 窄带范围±2%透射特性
+   - 近红外范围(1000-2000nm)透射特性
+4. **计算结果**
+
+   - 精细度 F
+   - 自由光谱范围(FSR)
+   - 半高全宽(FWHM)
+   - Q值
+   - 共振波长定位
+5. **保存图像**
+
+   - 点击"保存当前图像"按钮
+   - 支持PNG和PDF格式，300 DPI高清输出
 
 ### Zernike GUI 使用说明
 
